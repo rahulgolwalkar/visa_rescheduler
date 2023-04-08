@@ -6,6 +6,7 @@ import random
 import platform
 import configparser
 from datetime import datetime
+from playsound import playsound
 
 import requests
 from selenium import webdriver
@@ -43,7 +44,7 @@ REGEX_CONTINUE = "//a[contains(text(),'Continue')]"
 def MY_CONDITION(month, day): return True # No custom condition wanted for the new scheduled date
 
 STEP_TIME = 0.5  # time between steps (interactions with forms): 0.5 seconds
-RETRY_TIME = 105  # wait time between retries/checks for available dates: 10 minutes
+RETRY_TIME = 600  # wait time between retries/checks for available dates: 10 minutes
 EXCEPTION_TIME = 60*30  # wait time when an exception occurs: 30 minutes
 COOLDOWN_TIME = 60*60  # wait time when temporary banned (empty list): 60 minutes
 
@@ -219,6 +220,14 @@ def get_available_date(dates):
         new_date = datetime.strptime(date, "%Y-%m-%d")
         result = my_date > new_date
         print(f'Is {my_date} > {new_date}:\t{result}')
+
+        if result:
+            print("Checking if it's today's date: rrrrrrrrr")
+            playsound('./sound.wav')
+            today = datetime.today().strftime('%Y-%m-%d')
+            if new_date == today:
+                print("Today's date found! Skipping... tooooooo soon!")
+                return False
         return result
 
     print("Checking for an earlier date:")
@@ -250,7 +259,7 @@ if __name__ == "__main__":
             print(f"Retry count: {retry_count}")
             print()
 
-            dates = get_date()[:5]
+            dates = get_date()#[:5]
             if not dates:
               msg = "List is empty"
               send_notification(msg)
